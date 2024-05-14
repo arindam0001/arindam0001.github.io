@@ -25,7 +25,23 @@ jobs:
         run: npm run build
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          
+          # Create a new branch for deployment
+          git checkout --orphan gh-pages
+          git rm -rf .
+
+          # Copy the contents of the dist folder to the root
+          cp -r dist/* .
+
+          # Create a .nojekyll file to bypass Jekyll processing
+          touch .nojekyll
+
+          # Add the files to the new branch
+          git add -A
+          git commit -m "Deploy to GitHub Pages"
+
+          # Force push to the gh-pages branch
+          git push -f origin gh-pages
